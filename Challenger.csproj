@@ -62,7 +62,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Challenger.cs" />
+    <Compile Include="Challenger.Effect.cs" />
+    <Compile Include="Challenger.NPCAI.cs" />
+    <Compile Include="Challenger.ProjAI.cs" />
+    <Compile Include="Challenger.Tool.cs" />
+    <Compile Include="CMain.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="CProjectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

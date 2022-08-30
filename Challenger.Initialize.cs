@@ -16,6 +16,7 @@ using System.Collections;
 using Microsoft.Xna.Framework;
 using Terraria.DataStructures;
 using OTAPI;
+using Newtonsoft.Json;
 
 namespace Challenger
 {
@@ -29,10 +30,12 @@ namespace Challenger
             }
         }
 
+
         private void OnReload(ReloadEventArgs e)
         {
             config = Config.LoadConfig();
         }
+
 
         //怪物触碰玩家时吸血
         private void PlayerSufferDamage(object sender, GetDataHandlers.PlayerDamageEventArgs e)
@@ -42,61 +45,115 @@ namespace Challenger
 
             if (e.PlayerDeathReason._sourceNPCIndex != -1)
             {
-                NPC npc = Main.npc[e.PlayerDeathReason._sourceNPCIndex];
-                int number;
-                if (!npc.boss)
-                {
-                    if (npc.lifeMax * 0.1f <= 200)
-                        number = (int)((e.Damage * 0.7f + npc.lifeMax * 0.1f) * config.BloodAbsorptionRatio_吸血比率);
-                    else
-                        number = (int)((e.Damage * 0.7f + 250) * config.BloodAbsorptionRatio_吸血比率);
-                    npc.life += number;
-                    
-                }
-                else
-                {
-                    number = (int)((e.Damage * 0.3f + npc.lifeMax * 0.01f) * config.BloodAbsorptionRatio_吸血比率 * 2);
-                    npc.life += number;
-                }
-                if (npc.life >= npc.lifeMax)
-                {
-                    npc.life = npc.lifeMax;
-                }
-                npc.HealEffect(number);
-                npc.netUpdate = true;
+                TouchedAndBeSucked(e);
+            }
+            else if (e.PlayerDeathReason._sourceProjectileType != -1)
+            {
+                ProjAndBeSucked(e);
+
+
             }
         }
 
-        //怪物属性调整
-        private HookResult OnNPCSpawn(ref int index)
+
+        //怪物血量调整
+        private HookResult OnNpcSpawn(ref int index)
+        {
+            if (config.enableChallenge_是否启用挑战模式)
+            {
+                NPC npc = Main.npc[index];
+                npc.life = npc.lifeMax = (int)(npc.lifeMax * 1.2f);
+                npc.netUpdate = true;
+            }
+            return HookResult.Continue;
+        }
+
+
+        //修改射弹的ai
+        private void OnProjAIUpdate(ProjectileAiUpdateEventArgs args)
         {
             if (!config.enableChallenge_是否启用挑战模式)
             {
-                return HookResult.Cancel;
+                return;
             }
-            NPC npc = Main.npc[index];
-            npc.life = npc.lifeMax *= 100;
-            //TSPlayer.All.SendInfoMessage($"怪物{npc.FullName},的生命值{npc.life}/{npc.lifeMax}生成");
-            return HookResult.Continue;
+
+            //如果是血包射弹的话 (ai[0]是造成接触伤害的敌怪索引，ai[1]是造成的伤害，c_ai[2]是补给给玩家的血)
+            BloodBagAI(args);
+
+            //魔法剑射弹
+            MagicSwordAI(args);
+
         }
 
-        private void OnPostNetDefaults(NPC npc, ref int type, ref NPCSpawnParams spawnparams)
+
+        //npc击中时触发
+        private void OnNpcStrike(NpcStrikeEventArgs args)
         {
-            npc.life = npc.lifeMax *= 100;
+            if (!config.enableChallenge_是否启用挑战模式)
+            {
+                return;
+            }
+
+            CrimsonArmorEffect(args);
+
+            ShadowArmorEffect(args);
         }
 
-        private void OnPostAI(NPC npc)
+
+        //游戏更新
+        private void OnGameUpdate(EventArgs args)
         {
-            //npc.life = npc.lifeMax *= 100;
-            //TSPlayer.All.SendInfoMessage($"怪物{npc.FullName},的生命值{npc.life}/{npc.lifeMax}生成");
         }
 
-        private HookResult OnPreAI(NPC npc)
+
+        //修改npc的ai
+        private void OnNpcPostAI(NPC npc)
         {
-            return HookResult.Continue;
+            if (!config.enableChallenge_是否启用挑战模式)
+            {
+                return;
+            }
+
+            int index = npc.netID;
+            switch (index)
+            {
+                case 4:
+                    EyeofCthulhu(npc);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        //测试
+        private void OnTest(ServerChatEventArgs args)
+        {
+        }
+
+
+        //指令启用挑战模式
+        private void EnableModel(CommandArgs args)
+        {
+            if (args.Parameters.Any())
+            {
+                args.Player.SendInfoMessage("输入 /enable 来启用挑战模式，再次使用取消");
+                return;
+            }
+            if (config.enableChallenge_是否启用挑战模式)
+            {
+                config.enableChallenge_是否启用挑战模式 = false;
+                File.WriteAllText(configPath, JsonConvert.SerializeObject(config, Formatting.Indented));
+                args.Player.SendMessage($"挑战模式已取消，您觉得不够愉快？", Color.DeepPink);
+            }
+            else
+            {
+                config.enableChallenge_是否启用挑战模式 = true;
+                File.WriteAllText(configPath, JsonConvert.SerializeObject(config, Formatting.Indented));
+                args.Player.SendMessage($"挑战模式启用，祝您愉快。", Color.GreenYellow);
+            }
         }
 
 
     }
-
 }
