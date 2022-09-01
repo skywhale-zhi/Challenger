@@ -30,11 +30,10 @@ namespace Challenger
 
         public string configPath = Path.Combine(TShock.SavePath + "/Challenger", "ChallengerConfig.json");
 
-        public Config config;
+        public static Config config;
 
         public Challenger(Main game) : base(game)
         {
-            CMain cMain = new CMain();
         }
 
         public override void Initialize()
@@ -44,24 +43,31 @@ namespace Challenger
 
             //运行时
             ServerApi.Hooks.GameUpdate.Register(this, OnGameUpdate);
+            //重载config文件
             GeneralHooks.ReloadEvent += OnReload;
             //怪物触碰玩家时吸血
             GetDataHandlers.PlayerDamage += PlayerSufferDamage;
-            //怪物血量调整
-            Hooks.Npc.Spawn += OnNpcSpawn;
+
             //更新所有射弹时的钩子
             ServerApi.Hooks.ProjectileAIUpdate.Register(this, OnProjAIUpdate);
+            //在proj杀死时，清除CProj
+            Hooks.Projectile.PostKilled += OnProjPostKilled;
+
+            //怪物生成时设置CNPC
+            Hooks.Npc.Spawn += OnNpcSpawn;
             //更新所有npc时的钩子
             Hooks.Npc.PostAI += OnNpcPostAI;
-            //测试钩子
-            ServerApi.Hooks.ServerChat.Register(this, OnTest);
-            //npc被击中时触发
+            //在npc被杀死时，清除CNPC
+            Hooks.Npc.Killed += OnNpcKilled;
+
+            //npc被击中时触发，用于触发某些套装效果
             ServerApi.Hooks.NpcStrike.Register(this, OnNpcStrike);
+
 
             //指令
             Commands.ChatCommands.Add(new Command("challenger.enable", EnableModel, "cenable", "cenable")
             {
-                HelpText = "输入 /enable 来启用挑战模式，再次使用取消"
+                HelpText = "输入 /cenable 来启用挑战模式，再次使用取消"
             });
 
         }
@@ -72,17 +78,16 @@ namespace Challenger
             {
                 ServerApi.Hooks.GameUpdate.Deregister(this, OnGameUpdate);
                 GeneralHooks.ReloadEvent -= OnReload;
-                GetDataHandlers.PlayerDamage -= PlayerSufferDamage; 
-                Hooks.Npc.Spawn -= OnNpcSpawn;
+                GetDataHandlers.PlayerDamage -= PlayerSufferDamage;
+
                 ServerApi.Hooks.ProjectileAIUpdate.Deregister(this, OnProjAIUpdate);
+                Hooks.Projectile.PostKilled -= OnProjPostKilled;
+
+                Hooks.Npc.Spawn -= OnNpcSpawn; 
                 Hooks.Npc.PostAI -= OnNpcPostAI; 
-                ServerApi.Hooks.ServerChat.Deregister(this, OnTest);
+                Hooks.Npc.Killed -= OnNpcKilled;
+
                 ServerApi.Hooks.NpcStrike.Deregister(this, OnNpcStrike);
-
-
-
-
-
             }
             base.Dispose(disposing);
         }

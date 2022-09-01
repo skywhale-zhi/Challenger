@@ -1,104 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TShockAPI;
-using TShockAPI.Hooks;
-using Terraria;
+﻿using Terraria;
 using TerrariaApi.Server;
-using System.IO;
-using Terraria.Localization;
-using System.Diagnostics;
-using Terraria.ID;
-using System.Data;
-using TShockAPI.DB;
-using System.Collections;
 using Microsoft.Xna.Framework;
-using Terraria.DataStructures;
-using OTAPI;
 
-namespace Challenger
+namespace Challenger.CProjs
 {
-    public partial class Challenger : TerrariaPlugin
+    public class MagicSwordProj : CProjectile
     {
-        //被怪物伤害后，被抽走的血包射弹AI，其实就是红宝石射弹改AI
-        public void BloodBagAI(ProjectileAiUpdateEventArgs args)
+        public MagicSwordProj() : base() { }
+        public MagicSwordProj(Projectile projectile) : base(projectile) { }
+        public MagicSwordProj(Projectile projectile, float ai0, float ai1, float ai2, float ai3, float ai4, float ai5, int l1) : base(projectile, ai0, ai1, ai2, ai3, ai4, ai5, l1) { }
+
+        public static void ProjectileAI(ProjectileAiUpdateEventArgs args)
         {
-            Projectile projectile = args.Projectile;
-            NPC npc = null;
-            if (projectile.type == 125 && projectile.ai[1] > 0)
-            {
-                //游戏刚开启的一段时间，这个cprojectile会变成null，我猜是没有加载完全导致的，为了避免异常，这里需要判断下
-                CProjectile cprojectile = CMain.cProjectiles[projectile.whoAmI];
-                if (cprojectile == null)
-                {
-                    projectile.Kill();
-                    return;
-                }
-                npc = Main.npc[(int)projectile.ai[0]];
-                //如果是接触伤害，且伤害玩家的敌对npc仍存在，让靠近他给他回血
-                if ((int)projectile.ai[0] != 0 && npc != null && npc.active && (npc.position - projectile.Center).LengthSquared() <= 1500 * 1500)
-                {
-                    cprojectile.c_proj.velocity = (npc.Center - projectile.Center).SafeNormalize(Vector2.Zero) * 7f;
-                }
-                //如果造成接触伤害的敌怪死了 || 或者如果是射弹造成的伤害，即找不到对应发射该射弹的敌怪npc => 则找最近的一个敌对npc给他回血，若找不到，杀掉射弹
-                else
-                {
 
-                    npc = NearestHostileNPC(cprojectile.c_proj.position, 1500 * 1500);
-                    if (npc != null)
-                    {
-                        cprojectile.c_proj.velocity = (npc.Center - projectile.Center).SafeNormalize(Vector2.Zero) * 7f;
-                    }
-                    if (npc == null)
-                    {
-                        cprojectile.c_proj.velocity *= 0.95f;
-                    }
-                }
-                //靠近了敌对npc，回血完毕，杀掉射弹
-                if (npc != null && projectile.active && (projectile.position - npc.Center).LengthSquared() <= (npc.width * npc.height) / 2)
-                {
-
-                    npc.life += (int)cprojectile.c_proj.ai[1];
-                    npc.life = npc.life > npc.lifeMax ? npc.lifeMax : npc.life;
-                    npc.HealEffect((int)cprojectile.c_proj.ai[1]);
-                    cprojectile.c_proj.Kill();
-                    npc.netUpdate = true;
-                }
-
-                if (projectile.active && projectile.timeLeft <= 19 * 60)
-                {
-                    foreach (Player p in Main.player)
-                    {
-                        if ((projectile.Center - p.Center).LengthSquared() <= (p.width * p.height) / 2)
-                        {
-                            /*
-                            p.statLife += (int)cprojectile.c_ai[2];
-
-                            #region healeffect 的源码写法，这里用作发送信息至每个用户，让在他们本地绘制，因为player.healeffect无法在服务器端起作用
-                            Rectangle r = new Rectangle((int)p.position.X, (int)p.position.Y, p.width, p.height);
-                            CombatText.NewText(r, CombatText.HealLife, (int)cprojectile.c_ai[2]);
-                            NetMessage.SendData(81, -1, -1, null, (int)CombatText.HealLife.PackedValue, r.Center.X, r.Center.Y, cprojectile.c_ai[2]);
-                            #endregion
-
-                            //同步生命值
-                            NetMessage.SendData(16, -1, -1, NetworkText.Empty, p.whoAmI);
-                            */
-                            HealPlayer(p, (int)cprojectile.c_ai[2]);
-                            projectile.Kill();
-
-                            break;
-                        }
-                    }
-                }
-                projectile.netUpdate = true;
-            }
-        }
-
-
-        //魔法剑射弹
-        public void MagicSwordAI(ProjectileAiUpdateEventArgs args)
-        {
             /*
             Vector2 position = Main.player[e.Player.Index].Center;
             NPC npc = NearestHostileNPC(position, 1000 * 1000);
@@ -110,7 +24,7 @@ namespace Challenger
 
             Projectile projectile = args.Projectile;
             NPC npc = null;
-            if (projectile.type != 156 || projectile.ai[0] == 0)
+            if (projectile.ai[0] == 0)
             {
                 return;
             }
@@ -123,7 +37,7 @@ namespace Challenger
             {
                 float min_distance = 600f;
 
-                NPC targeNpc = NearestHostileNPC(projectile.Center, min_distance * min_distance);
+                NPC targeNpc = Challenger.NearestHostileNPC(projectile.Center, min_distance * min_distance);
 
                 //刚发射弹幕规定攻击状态为搜寻
                 if (projectile.ai[1] == 0)

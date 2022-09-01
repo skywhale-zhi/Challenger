@@ -1,53 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TShockAPI;
-using TShockAPI.Hooks;
-using Terraria;
-using TerrariaApi.Server;
-using System.IO;
-using Terraria.Localization;
-using System.Diagnostics;
-using Terraria.ID;
-using System.Data;
-using TShockAPI.DB;
-using System.Collections;
+﻿using Terraria;
 using Microsoft.Xna.Framework;
 using Terraria.DataStructures;
-using OTAPI;
+using TerrariaApi.Server;
+using TShockAPI;
 
 namespace Challenger
 {
-    public class CProjectile
+    public abstract class CProjectile
     {
         public Projectile c_proj;
         public float[] c_ai;
         public int c_index;
+        public int Lable;
 
-        public CProjectile()
+        protected CProjectile()
         {
             c_proj = null;
-            c_ai = new float[5] { 0f, 0f, 0f, 0f, 0f };
+            c_ai = new float[6] { 0f, 0f, 0f, 0f, 0f, 0f };
             c_index = -1;
+            Lable = 0;
         }
 
-        public CProjectile(Projectile projectile)
+        protected CProjectile(Projectile projectile)
         {
             c_proj = projectile;
-            c_ai = new float[5] { projectile.ai[0], projectile.ai[1], 0f, 0f, 0f };
+            c_ai = new float[6] { 0f, 0f, 0f, 0f, 0f, 0f };
             c_index = projectile.whoAmI;
-
-            CMain.cProjectiles[c_index] = new CProjectile();
-            CMain.cProjectiles[c_index].c_proj = projectile;
-            CMain.cProjectiles[c_index].c_ai = c_ai;
-            CMain.cProjectiles[c_index].c_index = c_index;
+            Lable = 0;
         }
-
-        public static CProjectile NewCProjectile(IEntitySource spawnSource, Vector2 position, Vector2 velocity, int Type, int Damage, float KnockBack, int Owner = 255, float ai0 = 0, float ai1 = 0, float a2 = 0, float a3 = 0, float a4 = 0)
+        
+        protected CProjectile(Projectile projectile, float ai0, float ai1, float ai2, float ai3, float ai4, float ai5, int l1)
         {
-            CProjectile cProjectile = new CProjectile(Main.projectile[Projectile.NewProjectile(spawnSource, position, velocity, Type, Damage, KnockBack, Owner, ai0, ai1)]);
-            return cProjectile;
+            c_proj = projectile;
+            c_ai = new float[6] { ai0, ai1, ai2, ai3, ai4, ai5 };
+            c_index = projectile.whoAmI;
+            Lable = l1;
         }
+
+        public virtual void ProjectileAI(Projectile projectile) { }
+
     }
 }

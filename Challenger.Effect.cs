@@ -16,6 +16,7 @@ using System.Collections;
 using Microsoft.Xna.Framework;
 using Terraria.DataStructures;
 using OTAPI;
+using Challenger.CProjs;
 
 namespace Challenger
 {
@@ -46,19 +47,11 @@ namespace Challenger
             //制作吸血视觉效果
             Vector2 position = Main.player[e.Player.TPlayer.whoAmI].Center;
             Vector2 v = (npc.Center - position).SafeNormalize(Vector2.Zero);
-            CProjectile proj = CProjectile.NewCProjectile(null, position, v, 125, 0, 0);
-            proj.c_proj.ai[0] = e.PlayerDeathReason._sourceNPCIndex;
-            proj.c_proj.ai[1] = number;
 
-            //若是血包被玩家接住，则回血，回血量 = （敌怪伤害 - 玩家防御）* （1 - 玩家伤害减免）, 血包放在c_ai[2]里保存
+            //若是血包被玩家接住，则回血，回血量 = （敌怪伤害 - 玩家防御）* （1 - 玩家伤害减免）/ 2, 血包放在c_ai[0]里保存
             int da = e.Damage - Main.player[e.Player.Index].statDefense >= 0 ? e.Damage - Main.player[e.Player.Index].statDefense : 0;
             da = (int)((1f - Main.player[e.Player.Index].endurance) * da);
-            proj.c_ai[2] = da / 2;
-
-            proj.c_proj.tileCollide = false;
-            proj.c_proj.timeLeft = 20 * 60;
-            proj.c_proj.netUpdate = true;
-
+            BloodBagProj.NewCProjectile(position, v, 125, 0, 0, 255, e.PlayerDeathReason._sourceNPCIndex, number, da / 2);
         }
 
 
@@ -67,20 +60,11 @@ namespace Challenger
         {
             //制作吸血效果
             Vector2 position = Main.player[e.Player.TPlayer.whoAmI].Center;
-            CProjectile proj = CProjectile.NewCProjectile(null, position, Vector2.Zero, 125, 0, 0);
-            proj.c_proj.ai[0] = 0;
-            proj.c_proj.ai[1] = e.Damage * config.BloodAbsorptionRatio_吸血比率;
 
-            //若是血包被玩家接住，则回血，回血量 = （敌怪伤害 - 玩家防御）* （1 - 玩家伤害减免）；
+            //若是血包被玩家接住，则回血，回血量 = （敌怪伤害 - 玩家防御）* （1 - 玩家伤害减免）/ 2, 血包放在c_ai[0]里保存
             int da = e.Damage - Main.player[e.Player.Index].statDefense >= 0 ? e.Damage - Main.player[e.Player.Index].statDefense : 0;
             da = (int)((1f - Main.player[e.Player.Index].endurance) * da);
-            proj.c_ai[2] = da / 2;
-
-            proj.c_proj.tileCollide = false;
-            proj.c_proj.timeLeft = 20 * 60;
-            proj.c_proj.netUpdate = true;
-
-
+            BloodBagProj.NewCProjectile(position, Vector2.Zero, 125, 0, 0, 255, 0, e.Damage * config.BloodAbsorptionRatio_吸血比率, da / 2);
         }
 
 
@@ -120,7 +104,7 @@ namespace Challenger
             //956 957 958
             if ((items[0].netID == 102 || items[0].netID == 956) && (items[1].netID == 101 || items[1].netID == 957) && (items[2].netID == 100 || items[2].netID == 958) && args.Critical)
             {
-                int count = Main.rand.Next(1,4);
+                int count = Main.rand.Next(1,5);
                 for (int i = 0; i < count; i++)
                 {
                     int index = Projectile.NewProjectile(null, args.Player.Center, new Vector2((float)Math.Cos(Main.rand.NextDouble() * MathHelper.TwoPi), (float)Math.Sin(Main.rand.NextDouble() * MathHelper.TwoPi)), 307, 25, 2);
