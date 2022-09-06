@@ -8,5 +8,7 @@ namespace Challenger
         public static CProjectile[] cProjectiles = new CProjectile[Main.maxProjectiles];
 
         public static CNPC[] cNPCs = new CNPC[Main.maxNPCs];
+
+        public static CPlayer[] cPlayers = new CPlayer[Main.maxPlayers];
     }
 }

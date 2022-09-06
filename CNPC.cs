@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
+using TShockAPI;
 
 namespace Challenger
 {
@@ -9,7 +10,6 @@ namespace Challenger
         public float[] c_ai;
         public int c_index;
         public int State;
-
 
         protected CNPC()
         {
@@ -34,17 +34,37 @@ namespace Challenger
             c_index = npc.whoAmI;
             State = i1;
         }
-        
+
         public Projectile NewProjectile(Vector2 position, Vector2 velocity, int Type, int Damage, float KnockBack, int Owner = 255, float ai0 = 0, float ai1 = 0)
         {
             int index = Projectile.NewProjectile(c_npc.GetSpawnSourceForNPCFromNPCAI(), position, velocity, Type, Damage, KnockBack, Owner, ai0, ai1);
             return Main.projectile[index];
         }
 
+        /// <summary>
+        /// 修改NPC的AI，在原版NPCAI运行的时候触发
+        /// </summary>
+        /// <param name="npc"></param>
         public virtual void NPCAI(NPC npc) { }
 
+        /// <summary>
+        /// 根据某些条件设置NPC的形态，也可以在这里写形态改变时的中二台词，可参考史莱姆王的写法
+        /// </summary>
+        /// <param name="npc"></param>
+        /// <returns></returns>
         public virtual int SetState(NPC npc) { return 0; }
 
-        public virtual void OnHurtPlayers(NPC npc) { }
+        /// <summary>
+        /// 在肢体直接伤害玩家的时候触发，可以在这里写相关debuff或者嘲讽语句
+        /// </summary>
+        /// <param name="npc"></param>
+        /// <param name="e"></param>
+        public virtual void OnHurtPlayers(NPC npc, GetDataHandlers.PlayerDamageEventArgs e) { }
+
+        /// <summary>
+        /// NPC死亡时触发，可以添加亡语
+        /// </summary>
+        /// <param name="npc"></param>
+        public virtual void OnKilled(NPC npc) { }
     }
 }

@@ -25,7 +25,7 @@ namespace Challenger.CNPCs
         public float skill1 = CooldownOfSkill1;
         public float skill2 = CooldownOfSkill2;
 
-        public int state = 0;
+        int state = 0;
 
         private void Spawn(int number)
         {
@@ -182,7 +182,7 @@ namespace Challenger.CNPCs
                         if (npc.ai[1] == 4 && npc.ai[2] % 10 == 0)
                         {
 
-                            Projectile proj = NewProjectile(npc.Center, Vector2.One.RotateRandom(Math.PI) * 0.5f, ProjectileID.CursedFlameHostile, 9, 5);
+                            Projectile proj = NewProjectile(npc.Center, Vector2.One.RotateRandom(MathHelper.TwoPi) * 0.5f, ProjectileID.CursedFlameHostile, 9, 5);
                             proj.timeLeft = 5 * 60;
                         }
                         //增大冲刺力度，并发射射弹
@@ -207,7 +207,8 @@ namespace Challenger.CNPCs
                 if (state == 0)
                 {
                     state = 1;
-                    TSPlayer.All.SendMessage("燃烧！无法熄灭的火焰", new Color(225, 71, 71));
+                    if (Challenger.config.EnableBroadcastConsumptionMode_启用广播话痨模式)
+                        TSPlayer.All.SendMessage("燃烧！无法熄灭的火焰", new Color(200, 200, 200));
                 }
                 return 0;
             }
@@ -216,7 +217,8 @@ namespace Challenger.CNPCs
                 if (state == 1)
                 {
                     state = 2;
-                    TSPlayer.All.SendMessage("你找到那颗子弹了吗", new Color(225, 71, 71));
+                    if (Challenger.config.EnableBroadcastConsumptionMode_启用广播话痨模式)
+                        TSPlayer.All.SendMessage("你找到那颗子弹了吗", new Color(200, 200, 200));
                 }
                 return 1;
             }
@@ -225,7 +227,8 @@ namespace Challenger.CNPCs
                 if (state == 2)
                 {
                     state = 3;
-                    TSPlayer.All.SendMessage("猪突猛进！", new Color(225, 71, 71));
+                    if (Challenger.config.EnableBroadcastConsumptionMode_启用广播话痨模式)
+                        TSPlayer.All.SendMessage("猪突猛进！", new Color(200, 200, 200));
                 }
                 return 2;
             }
@@ -234,9 +237,22 @@ namespace Challenger.CNPCs
                 if (state == 3)
                 {
                     state = 4;
-                    TSPlayer.All.SendMessage("疯狗狂叫！！！", new Color(225, 71, 71));
+                    if (Challenger.config.EnableBroadcastConsumptionMode_启用广播话痨模式)
+                        TSPlayer.All.SendMessage("疯狗狂叫！！！", new Color(200, 200, 200));
                 }
                 return 3;
+            }
+        }
+
+        public override void OnHurtPlayers(NPC npc, GetDataHandlers.PlayerDamageEventArgs e)
+        {
+            if (Challenger.config.EnableConsumptionMode_启用话痨模式)
+            {
+                int i = Main.rand.Next(1, 3);
+                if (i == 1)
+                    Challenger.SendPlayerText("就这就这！", new Color(200, 200, 200), npc.Center + new Vector2(0, -30));
+                else
+                    Challenger.SendPlayerText("看我创死你", new Color(200, 200, 200), npc.Center + new Vector2(0, -30));
             }
         }
     }

@@ -1,21 +1,9 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TShockAPI;
-using TShockAPI.Hooks;
 using Terraria;
-using TerrariaApi.Server;
-using System.IO;
 using Terraria.Localization;
-using System.Diagnostics;
-using Terraria.ID;
-using System.Data;
-using TShockAPI.DB;
-using System.Collections;
-using Microsoft.Xna.Framework;
-using Terraria.DataStructures;
-using OTAPI;
+using TerrariaApi.Server;
+using TShockAPI;
 
 namespace Challenger
 {
@@ -95,19 +83,78 @@ namespace Challenger
         }
 
 
+        //寻找最近的一个不满血玩家
+        public static Player NearWeakPlayer(Vector2 pos, float distanceSquared)
+        {
+            Player player = null;
+            foreach(Player p in Main.player)
+            {
+                if(!p.dead && (p.Center - pos).LengthSquared() < distanceSquared && p.statLifeMax - p.statLife > 2)
+                {
+                    player = p;
+                    distanceSquared = (p.Center - pos).LengthSquared();
+                }
+            }
+            return player;
+        }
+
+
         //玩家回血和治疗视觉效果
-        public static void HealPlayer(Player player, int num)
+        public static void HealPlayer(Player player, int num, bool visible = true)
         {
 
             player.statLife += num;
-
-            //healeffect 的源码写法，这里用作发送信息至每个用户，让在他们本地绘制，因为player.healeffect无法在服务器端起作用
-            Rectangle r = new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height);
-            CombatText.NewText(r, CombatText.HealLife, num);
-            NetMessage.SendData(81, -1, -1, null, (int)CombatText.HealLife.PackedValue, r.Center.X, r.Center.Y, num);
-            
+            if (visible)
+            {
+                //healeffect 的源码写法，这里用作发送信息至每个用户，让在他们本地绘制，因为player.healeffect无法在服务器端起作用
+                Rectangle r = new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height);
+                CombatText.NewText(r, CombatText.HealLife, num);
+                NetMessage.SendData(81, -1, -1, null, (int)CombatText.HealLife.PackedValue, r.Center.X, r.Center.Y, num);
+            }
             //同步生命值
             NetMessage.SendData(16, -1, -1, NetworkText.Empty, player.whoAmI);
+        }
+
+
+        //玩家回魔力和治疗视觉效果
+        public static void HealPlayerMana(Player player, int num)
+        {
+
+            player.statMana += num;
+
+            //healeffect 的源码写法，这里用作发送信息至每个用户，让在他们本地绘制
+            Rectangle r = new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height);
+            CombatText.NewText(r, CombatText.HealLife, num);
+            NetMessage.SendData(81, -1, -1, null, (int)CombatText.HealMana.PackedValue, r.Center.X, r.Center.Y, num);
+
+            //同步魔力值
+            NetMessage.SendData(42, -1, -1, NetworkText.Empty, player.whoAmI);
+        }
+
+
+        //给单个玩家发送悬浮文本
+        public static void SendPlayerText(TSPlayer player, string text, Color color, Vector2 position)
+        {
+            player.SendData(PacketTypes.CreateCombatTextExtended, text, (int)color.packedValue, position.X, position.Y);
+        }
+
+
+        //给全体玩家发送悬浮文本
+        public static void SendPlayerText(string text, Color color, Vector2 position)
+        {
+            TSPlayer.All.SendData(PacketTypes.CreateCombatTextExtended, text, (int)color.packedValue, position.X, position.Y);
+        }
+
+        //给单个玩家发送悬浮数字（只能是int），为什么数字要单独分出来？因为原版分出来了，我觉得分开速度更快（也许）
+        public static void SendPlayerText(TSPlayer player, int text, Color color, Vector2 position)
+        {
+            player.SendData(PacketTypes.CreateCombatText, null, (int)color.packedValue, position.X, position.Y, text);
+        }
+
+        //给全体玩家发送悬浮数字
+        public static void SendPlayerText(int text, Color color, Vector2 position)
+        {
+            TSPlayer.All.SendData(PacketTypes.CreateCombatText, null, (int)color.packedValue, position.X, position.Y, text);
         }
     }
 }

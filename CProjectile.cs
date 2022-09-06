@@ -12,7 +12,6 @@ namespace Challenger
         public float[] c_ai;
         public int c_index;
         public int Lable;
-
         protected CProjectile()
         {
             c_proj = null;
@@ -37,6 +36,11 @@ namespace Challenger
             Lable = l1;
         }
 
+        
+        /// <summary>
+        /// 修改projAI
+        /// </summary>
+        /// <param name="projectile"></param>
         public virtual void ProjectileAI(Projectile projectile) { }
 
     }

@@ -2,6 +2,9 @@
 using TerrariaApi.Server;
 using Microsoft.Xna.Framework;
 using TShockAPI;
+using Terraria.Audio;
+using Terraria.ID;
+using System;
 
 namespace Challenger.CProjs
 {
@@ -11,7 +14,7 @@ namespace Challenger.CProjs
         private BloodBagProj(Projectile projectile) : base(projectile) { }
         private BloodBagProj(Projectile projectile, float ai0, float ai1, float ai2, float ai3, float ai4, float ai5, int l1) : base(projectile, ai0, ai1, ai2, ai3, ai4, ai5, l1) { }
 
-        public float v = 6f;
+        public float v;
         public override void ProjectileAI(Projectile projectile)
         {
             //(ai[0]是造成接触伤害的敌怪索引，ai[1]是造成的伤害，c_ai[0]是补给给玩家的血)
@@ -45,19 +48,19 @@ namespace Challenger.CProjs
             }
             else if (Main.hardMode)
             {
-                v = 8f;
+                v = 7f;
             }
             else if (NPC.downedBoss2)
             {
-                v = 6f;
+                v = 4f;
             }
             else if (NPC.downedBoss1)
             {
-                v = 4f;
+                v = 3f;
             }
             else
             {
-                v = 3f;
+                v = 2f;
             }
 
             //如果是接触伤害，且伤害玩家的敌对npc仍存在，让靠近他给他回血
@@ -97,15 +100,29 @@ namespace Challenger.CProjs
             {
                 //白光之女皇伤害溢出，判断下免得有人被光女的回血弹造成数值溢出秒杀
                 cprojectile.c_proj.ai[0] = cprojectile.c_proj.ai[0] > 500 ? 500 : cprojectile.c_proj.ai[0];
-                foreach (Player p in Main.player)
+                try
                 {
-                    if ((projectile.Center - p.Center).LengthSquared() <= (p.width * p.height) / 2 && p.active)
+                    foreach (Player p in Main.player)
                     {
-                        Challenger.HealPlayer(p, (int)cprojectile.c_ai[0]);
-                        projectile.Kill();
-
-                        break;
+                        if ((projectile.Center - p.Center).LengthSquared() <= (p.width * p.height) / 2 && !p.dead)
+                        {
+                            if (Challenger.config.EnableConsumptionMode_启用话痨模式)
+                            {
+                                Challenger.HealPlayer(Main.player[p.whoAmI], (int)cprojectile.c_ai[0], false);
+                                Challenger.SendPlayerText($"血包治疗 + {(int)cprojectile.c_ai[0]}", new Color(0, 255, 0), p.Center);
+                            }
+                            else
+                            {
+                                Challenger.HealPlayer(Main.player[p.whoAmI], (int)cprojectile.c_ai[0]);
+                            }
+                            projectile.Kill();
+                            break;
+                        }
                     }
+                }
+                catch(Exception ex)
+                {
+                    TShock.Log.Error(ex.Message);
                 }
             }
             projectile.netUpdate = true;

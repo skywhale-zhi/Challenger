@@ -61,8 +61,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CNPCs\BrainofCthulhu.cs" />
+    <Compile Include="CNPCs\Deerclops.cs" />
     <Compile Include="CNPCs\EyeofCthulhu.cs" />
+    <Compile Include="CNPCs\QueenBee.cs" />
+    <Compile Include="CNPCs\Skeletron.cs" />
     <Compile Include="CNPCs\SlimeKing.cs" />
+    <Compile Include="CNPCs\WallofFlesh.cs" />
+    <Compile Include="CPlayer.cs" />
+    <Compile Include="CProjs\BeetleHeal.cs" />
     <Compile Include="CProjs\BloodBagProj.cs" />
     <Compile Include="Challenger.cs" />
     <Compile Include="Challenger.Effect.cs" />
@@ -71,7 +78,7 @@
     <Compile Include="CNPC.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="CProjectile.cs" />
-    <Compile Include="CProjs\MagicSwordProj.cs" />
+    <Compile Include="CProjs\CrystalLeafShot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

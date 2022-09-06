@@ -18,7 +18,7 @@ namespace Challenger.CNPCs
         public readonly float CooldownOfSkill1 = 250;
         public readonly float CooldownOfSkill2 = 250;
 
-        public int state = 0;
+        int state = 0;
 
         //ai设置 cai[0],cai[1],cai[2]用来设置冷却时间，cai[3]用来进行状态宣告
         public override void NPCAI(NPC npc)
@@ -149,7 +149,8 @@ namespace Challenger.CNPCs
                 if (state == 0)
                 {
                     state = 1;
-                    TSPlayer.All.SendMessage("史莱姆王习得冰魔法归来", new Color(0, 146, 255));
+                    if (Challenger.config.EnableBroadcastConsumptionMode_启用广播话痨模式)
+                        TSPlayer.All.SendMessage("史莱姆王习得冰魔法归来", new Color(0, 146, 255));
                 }
                 return 0;
             }
@@ -158,7 +159,8 @@ namespace Challenger.CNPCs
                 if (state == 1)
                 {
                     state = 2;
-                    TSPlayer.All.SendMessage("寒风呼啸", new Color(0, 146, 255));
+                    if (Challenger.config.EnableBroadcastConsumptionMode_启用广播话痨模式)
+                        TSPlayer.All.SendMessage("寒风呼啸", new Color(0, 146, 255));
                 }
                 return 1;
             }
@@ -167,7 +169,8 @@ namespace Challenger.CNPCs
                 if (state == 2)
                 {
                     state = 3;
-                    TSPlayer.All.SendMessage("你感觉寒冷刺骨", new Color(0, 146, 255));
+                    if (Challenger.config.EnableBroadcastConsumptionMode_启用广播话痨模式)
+                        TSPlayer.All.SendMessage("你感觉寒冷刺骨", new Color(0, 146, 255));
                 }
                 return 2;
             }
@@ -176,9 +179,25 @@ namespace Challenger.CNPCs
                 if (state == 3)
                 {
                     state = 4;
-                    TSPlayer.All.SendMessage("史莱姆王发怒了", new Color(0, 146, 255));
+                    if (Challenger.config.EnableBroadcastConsumptionMode_启用广播话痨模式)
+                        TSPlayer.All.SendMessage("史莱姆王发怒了", new Color(0, 146, 255));
                 }
                 return 3;
+            }
+        }
+
+
+        public override void OnHurtPlayers(NPC npc, GetDataHandlers.PlayerDamageEventArgs e)
+        {
+            if (Challenger.config.EnableConsumptionMode_启用话痨模式)
+            {
+                int i = Main.rand.Next(1, 4);
+                if (i == 1)
+                    Challenger.SendPlayerText("走位真菜", new Color(0, 146, 255), npc.Center + new Vector2(0, -30));
+                else if (i == 2)
+                    Challenger.SendPlayerText("连我都打不过，回家喝奶吧你", new Color(0, 146, 255), npc.Center + new Vector2(0, -30));
+                else
+                    Challenger.SendPlayerText("小辣鸡", new Color(0, 146, 255), npc.Center + new Vector2(0, -30));
             }
         }
     }
