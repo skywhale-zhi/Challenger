@@ -12,7 +12,7 @@ namespace Challenger
         public float[] c_ai;
         public int c_index;
         public int Lable;
-        protected CProjectile()
+        protected CProjectile()//lable是标签，用于区分用同一个射弹类在AI方法里实现不同功能进行区分，默认0
         {
             c_proj = null;
             c_ai = new float[6] { 0f, 0f, 0f, 0f, 0f, 0f };
@@ -28,10 +28,10 @@ namespace Challenger
             Lable = 0;
         }
         
-        protected CProjectile(Projectile projectile, float ai0, float ai1, float ai2, float ai3, float ai4, float ai5, int l1)
+        protected CProjectile(Projectile projectile, int l1, float cai0, float cai1, float cai2, float cai3, float cai4, float cai5)
         {
             c_proj = projectile;
-            c_ai = new float[6] { ai0, ai1, ai2, ai3, ai4, ai5 };
+            c_ai = new float[6] { cai0, cai1, cai2, cai3, cai4, cai5 };
             c_index = projectile.whoAmI;
             Lable = l1;
         }
@@ -42,6 +42,12 @@ namespace Challenger
         /// </summary>
         /// <param name="projectile"></param>
         public virtual void ProjectileAI(Projectile projectile) { }
+
+        /// <summary>
+        /// 杀死射弹前的操作
+        /// </summary>
+        /// <param name="projectile"></param>
+        public virtual void PreProjectileKilled(Projectile projectile) { }
 
     }
 }

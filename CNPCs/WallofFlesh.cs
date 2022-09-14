@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
-using Terraria.ID;
-using Microsoft.Xna.Framework;
 using Terraria.DataStructures;
+using Terraria.ID;
 using TShockAPI;
 
 namespace Challenger.CNPCs
@@ -37,11 +37,11 @@ namespace Challenger.CNPCs
                         skill0 = CooldownOfSkill0 + Main.rand.Next(51);
                         break;
                     case 1:
-                        NewProjectile(npc.Center, vector * 20, ProjectileID.CultistBossFireBall, 16, 5);
+                        NewProjectile(npc.Center, vector * 20, ProjectileID.CultistBossFireBall, 18, 5);
                         skill0 = CooldownOfSkill0;
                         break;
                     case 2:
-                        NewProjectile(npc.Center, vector * 26, ProjectileID.CultistBossFireBall, 20, 5);
+                        NewProjectile(npc.Center, vector * 26, ProjectileID.CultistBossFireBall, 22, 5);
                         skill0 = CooldownOfSkill0 - 20;
                         break;
                     default:
@@ -53,27 +53,27 @@ namespace Challenger.CNPCs
                 switch (State)
                 {
                     case 0:
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 14, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 14, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 14, 5);
 
                         skill1 = CooldownOfSkill0 + Main.rand.Next(51);
                         break;
                     case 1:
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 18, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 18, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 18, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 18, 5);
 
                         skill1 = CooldownOfSkill0;
                         break;
                     case 2:
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
-                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 10, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 20, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 20, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 20, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 20, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 20, 5);
+                        NewProjectile(npc.Center + new Vector2(0, Main.rand.Next(-200, 200)), (vector + Vector2.One.RotateRandom(Math.PI) * 0.2f) * 10, 811, 20, 5);
 
                         skill1 = CooldownOfSkill0;
                         break;
@@ -112,7 +112,7 @@ namespace Challenger.CNPCs
                 {
                     state = 3;
                     if (Challenger.config.EnableBroadcastConsumptionMode_启用广播话痨模式)
-                        TSPlayer.All.SendMessage("生死时速", new Color(255, 77, 0));
+                        TSPlayer.All.SendMessage("速度与激情", new Color(255, 77, 0));
                 }
                 return 2;
             }

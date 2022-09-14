@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
+using TerrariaApi.Server;
 using TShockAPI;
 
 namespace Challenger
@@ -66,5 +67,10 @@ namespace Challenger
         /// </summary>
         /// <param name="npc"></param>
         public virtual void OnKilled(NPC npc) { }
+
+        /// <summary>
+        /// 被玩家击中时触发
+        /// </summary>
+        public virtual void WhenHurtByPlayer(NpcStrikeEventArgs args) { }
     }
 }

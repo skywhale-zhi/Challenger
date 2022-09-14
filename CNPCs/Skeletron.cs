@@ -1,10 +1,10 @@
-﻿using System;
-using Terraria;
-using Terraria.ID;
-using Microsoft.Xna.Framework;
-using Terraria.DataStructures;
-using TShockAPI;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.ID;
+using TShockAPI;
 
 namespace Challenger.CNPCs
 {
@@ -20,12 +20,13 @@ namespace Challenger.CNPCs
 
         List<int> surrandIndex = new List<int>();
 
-        const int MaxSurrandNum = 10;
+        const int MaxSurrandNum = 12;
 
         int skill0 = 240;
 
         public override void NPCAI(NPC npc)
         {
+            //TSPlayer.All.SendInfoMessage($"state{State}, ai[0]:{npc.ai[0]}，ai[1]:{npc.ai[1]}，ai[2]:{npc.ai[2]}，ai[3]:{npc.ai[3]}");
             skill0--;
             State = SetState(npc);
             NPCAimedTarget target = npc.GetTargetData();
@@ -36,8 +37,8 @@ namespace Challenger.CNPCs
                         if (skill0 < 0)
                         {
                             Vector2 vector = npc.Center.DirectionTo(target.Center);
-                            NewProjectile(npc.Center, vector.RotatedBy(MathHelper.Pi / 6), 270, 12, 5);
-                            skill0 = 240 + Main.rand.Next(-60, 61);
+                            NewProjectile(npc.Center, vector.RotatedBy(MathHelper.Pi / 6), 270, 11, 5);
+                            skill0 = 220 + Main.rand.Next(-60, 61);
                         }
                     }
                     break;
@@ -47,9 +48,9 @@ namespace Challenger.CNPCs
                         {
                             for (int i = 0; i < 4; i++)
                             {
-                                NewProjectile(npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2.0 / 4 * i + rotate) * 4, 270, 11, 5);
+                                NewProjectile(npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2.0 / 4 * i + rotate) * 4, 270, 12, 5);
                             }
-                            skill0 = 180 + Main.rand.Next(-60, 61);
+                            skill0 = 160 + Main.rand.Next(-60, 61);
                         }
                         break;
                     }
@@ -57,11 +58,18 @@ namespace Challenger.CNPCs
                     {
                         if (skill0 < 0)
                         {
-                            for (int i = 0; i < 5; i++)
+                            int num = Main.rand.Next(4, 7);
+                            for (int i = 0; i < num; i++)
                             {
-                                NewProjectile(npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2.0 / 5 * i + rotate) * 6, 270, 10, 5);
+                                NewProjectile(npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2.0 / 5 * i + rotate) * 3, 270, 15, 5);
                             }
-                            skill0 = 150 + Main.rand.Next(-60, 61);
+                            skill0 = 120 + Main.rand.Next(-60, 61);
+                        }
+
+                        if (npc.ai[1] == 1 && npc.ai[2] % 10 == 0)
+                        {
+                            Projectile proj = NewProjectile(npc.Center, Vector2.Zero, ProjectileID.Shadowflames, 15, 5);
+                            proj.timeLeft = 40;
                         }
                     }
                     break;
@@ -69,29 +77,36 @@ namespace Challenger.CNPCs
                     {
                         if (skill0 < 0)
                         {
+                            int num = Main.rand.Next(5, 10);
                             if (Main.rand.Next(2) == 0)
                             {
-                                for (int i = 0; i < 6; i++)
+                                for (int i = 0; i < num; i++)
                                 {
-                                    NewProjectile(npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2.0 / 6 * i + rotate) * 8, 270, 10, 30);
+                                    NewProjectile(npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2.0 / 6 * i + rotate) * 3, 270, 18, 30);
                                 }
                             }
                             else
                             {
-                                for (int i = 0; i < 8; i++)
+                                for (int i = 0; i < num; i++)
                                 {
-                                    NewProjectile(npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2.0 / 8 * i + rotate) * 3, 299, 10, 30);
+                                    NewProjectile(npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2.0 / 8 * i + rotate) * 5, 299, 18, 30);
                                 }
                             }
-                            skill0 = 120 + Main.rand.Next(-60, 61);
+                            skill0 = 100 + Main.rand.Next(-60, 31);
+                        }
+
+                        if (npc.ai[1] == 1 && npc.ai[2] % 5 == 0)
+                        {
+                            Projectile proj = NewProjectile(npc.Center, Vector2.Zero, ProjectileID.Shadowflames, 20, 5);
+                            proj.timeLeft = 180;
                         }
                     }
                     break;
             }
 
-            if (c_ai[0] < MaxSurrandNum && Main.rand.Next(60) == 0)
+            if (c_ai[0] < MaxSurrandNum && Main.rand.Next(180) == 0)
             {
-                int index = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.CursedSkull);
+                int index = NPC.NewNPC(npc.GetSpawnSourceForNPCFromNPCAI(), (int)npc.Center.X, (int)npc.Center.Y, NPCID.CursedSkull);
 
                 CMain.cNPCs[index].c_ai[0] = npc.whoAmI;
                 c_ai[0]++;
@@ -156,21 +171,30 @@ namespace Challenger.CNPCs
             }
         }
 
+
         public override void OnHurtPlayers(NPC npc, GetDataHandlers.PlayerDamageEventArgs e)
         {
             if (Challenger.config.EnableConsumptionMode_启用话痨模式)
             {
                 int i = Main.rand.Next(1, 4);
                 if (i == 1)
-                    Challenger.SendPlayerText("再让我逮到一下", new Color(150, 143, 102), npc.Center + new Vector2(0, -30));
+                    Challenger.SendPlayerText("再让我逮到一下你就玩玩", new Color(150, 143, 102), npc.Center + new Vector2(0, -30));
                 else if (i == 2)
                     Challenger.SendPlayerText("创死你", new Color(150, 143, 102), npc.Center + new Vector2(0, -30));
                 else
-                    Challenger.SendPlayerText("贴贴", new Color(150, 143, 102), npc.Center + new Vector2(0, -30));
+                    Challenger.SendPlayerText("想再贴贴吗？", new Color(150, 143, 102), npc.Center + new Vector2(0, -30));
+            }
+        }
+
+
+        public override void OnKilled(NPC npc)
+        {
+            for (int i = 0; i < 35; i++)
+            {
+                Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2 / 35 * i) * 5, 299, 21, 10);
             }
         }
     }
-
 
 
     public class SkeletronHand : CNPC
@@ -191,16 +215,8 @@ namespace Challenger.CNPCs
                 case 0:
                     if (npc.ai[2] == 2 || npc.ai[2] == 5)
                     {
-                        timer++;
-                        if (timer % 1 == 0)
-                        {
-                            Projectile proj = NewProjectile(npc.Center, Vector2.Zero, ProjectileID.Shadowflames, 10, 5);
-                            proj.timeLeft = 30;
-                        }
-                    }
-                    else
-                    {
-                        timer = 0;
+                        Projectile proj = NewProjectile(npc.Center, Vector2.Zero, ProjectileID.Shadowflames, 10, 5);
+                        proj.timeLeft = 30;
                     }
                     break;
                 case 1:
@@ -210,7 +226,7 @@ namespace Challenger.CNPCs
                         if (timer % 5 == 0)
                         {
                             Projectile proj = NewProjectile(npc.Center, Vector2.Zero, ProjectileID.Shadowflames, 10, 5);
-                            proj.timeLeft = 60 * 25;
+                            proj.timeLeft = 60 * 40;
                         }
                     }
                     else
@@ -255,7 +271,7 @@ namespace Challenger.CNPCs
                 double f = Main.rand.NextDouble() * 3;
                 for (int i = 0; i < 10; i++)
                 {
-                    Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2 / 10 * i + f) * 5, 270, 9, 30);
+                    Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2 / 10 * i + f) * 5, 270, 20, 30);
                 }
             }
             else
@@ -263,7 +279,7 @@ namespace Challenger.CNPCs
                 double f = Main.rand.NextDouble() * 3;
                 for (int i = 0; i < 10; i++)
                 {
-                    Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2 / 10 * i + f) * 5, 299, 9, 30);
+                    Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI * 2 / 10 * i + f) * 5, 299, 20, 30);
                 }
             }
         }
@@ -281,6 +297,7 @@ namespace Challenger.CNPCs
                     Challenger.SendPlayerText("离地牢远点！！！", new Color(150, 143, 102), npc.Center + new Vector2(0, -30));
             }
         }
+
     }
 
 
@@ -298,11 +315,11 @@ namespace Challenger.CNPCs
             if (Main.npc[(int)c_ai[0]].active && Main.npc[(int)c_ai[0]].type == NPCID.SkeletronHead)
             {
                 skill0--;
-                
+
                 if (skill0 < 0)
                 {
-                    NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 33);
-                    skill0 = 240 + Main.rand.Next(-60, 60);
+                    NPC.NewNPC(npc.GetSpawnSourceForNPCFromNPCAI(), (int)npc.Center.X, (int)npc.Center.Y, 33);
+                    skill0 = 180 + Main.rand.Next(-60, 60);
                 }
             }
 

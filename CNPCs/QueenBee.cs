@@ -35,11 +35,11 @@ namespace Challenger.CNPCs
                         timer++;
                         if (npc.direction == 1 && target.Position.X > npc.position.X || npc.direction == -1 && target.Position.X < npc.position.X)
                         {
-                            npc.velocity += npc.velocity * 0.03f;
+                            npc.velocity += npc.velocity * 0.04f;
                         }
                         else
                         {
-                            npc.velocity -= npc.velocity * 0.03f;
+                            npc.velocity -= npc.velocity * 0.04f;
                         }
                         npc.netUpdate = true;
                     }
@@ -54,11 +54,11 @@ namespace Challenger.CNPCs
                         timer++;
                         if (npc.direction == 1 && target.Position.X > npc.position.X || npc.direction == -1 && target.Position.X < npc.position.X)
                         {
-                            npc.velocity += npc.velocity * 0.06f;
+                            npc.velocity += npc.velocity * 0.07f;
                         }
                         else
                         {
-                            npc.velocity -= npc.velocity * 0.06f;
+                            npc.velocity -= npc.velocity * 0.07f;
                         }
                         npc.netUpdate = true;
                     }
@@ -73,11 +73,11 @@ namespace Challenger.CNPCs
                         timer++;
                         if (npc.direction == 1 && target.Position.X > npc.position.X || npc.direction == -1 && target.Position.X < npc.position.X)
                         {
-                            npc.velocity += npc.velocity * 0.1f;
+                            npc.velocity += npc.velocity * 0.12f;
                         }
                         else
                         {
-                            npc.velocity -= npc.velocity * 0.1f;
+                            npc.velocity -= npc.velocity * 0.12f;
                         }
                         npc.netUpdate = true;
                     }

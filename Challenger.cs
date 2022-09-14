@@ -1,17 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using OTAPI;
+﻿using OTAPI;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
-using Terraria.ID;
-using Terraria.Localization;
 using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.Hooks;
@@ -36,6 +27,7 @@ namespace Challenger
         public static int testnum1 = 1;
         public static int testnum2 = 1;
         public static int testnum3 = 1;
+
         public Challenger(Main game) : base(game)
         {
         }
@@ -46,11 +38,12 @@ namespace Challenger
             config = Config.LoadConfig();
 
             //运行时
-            ServerApi.Hooks.GameUpdate.Register(this, OnGameUpdate);
+            //ServerApi.Hooks.GameUpdate.Register(this, OnGameUpdate);
             //重载config文件
             GeneralHooks.ReloadEvent += OnReload;
             //怪物触碰玩家时吸血
             GetDataHandlers.PlayerDamage += PlayerSufferDamage;
+            
 
             //更新所有射弹时的钩子
             ServerApi.Hooks.ProjectileAIUpdate.Register(this, OnProjAIUpdate);
@@ -59,17 +52,19 @@ namespace Challenger
             //在proj杀死时，清除CProj
             Hooks.Projectile.PostKilled += OnProjPostKilled;
 
+
             //怪物生成时设置CNPC
             Hooks.Npc.Spawn += OnNpcSpawn;
             //更新所有npc时的钩子
             Hooks.Npc.PostAI += OnNpcPostAI;
             //在npc被杀死时，清除CNPC
             Hooks.Npc.Killed += OnNpcKilled;
+            //npc被击中时触发，用于触发某些套装效果
+            ServerApi.Hooks.NpcStrike.Register(this, OnNpcStrike);
+            
 
             //拿持修改后的物品时添加提示词
             GetDataHandlers.PlayerSlot += OnHoldItem;
-            //npc被击中时触发，用于触发某些套装效果
-            ServerApi.Hooks.NpcStrike.Register(this, OnNpcStrike);
 
             //一直执行
             Hooks.Player.PreUpdate += OnPreUpdate;
@@ -79,9 +74,6 @@ namespace Challenger
             //玩家进出服务器时处理Cplayer
             ServerApi.Hooks.ServerJoin.Register(this, OnServerjoin);
             ServerApi.Hooks.ServerLeave.Register(this, OnServerLeave);
-
-
-            
 
 
             //指令
@@ -140,7 +132,7 @@ namespace Challenger
         {
             if (disposing)
             {
-                ServerApi.Hooks.GameUpdate.Deregister(this, OnGameUpdate);
+                //ServerApi.Hooks.GameUpdate.Deregister(this, OnGameUpdate);
                 GeneralHooks.ReloadEvent -= OnReload;
                 GetDataHandlers.PlayerDamage -= PlayerSufferDamage;
 
